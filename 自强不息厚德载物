@@ -1,0 +1,332 @@
+
+#include "reg51.h"		
+#include "intrins.h"
+
+typedef unsigned int u16;	
+typedef unsigned char u8;
+
+#define led P0   //流水	
+
+sbit SRCLK=P3^6;
+sbit RCLK1=P3^5;
+sbit SER=P3^4;
+
+ sbit beep=P2^7;	  
+
+sbit k1=P1^0;
+sbit k2=P1^1;
+sbit k3=P1^2;
+sbit k4=P1^3;
+sbit k5=P1^4;
+sbit k6=P1^5;
+sbit k7=P1^6;
+sbit k8=P1^7;
+
+
+
+u8  ledwei[32]=
+{
+0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 
+};
+
+
+
+u8 code ledduan1[32]=
+{
+ /*--  文字:  自  --*/
+/*--  宋体12;  此字体下对应的点阵为：宽x高=16x16   --*/
+0x00,0x00,0x00,0xF8,0x88,0x8C,0x8A,0x89,0x88,0x88,0x88,0xF8,0x00,0x00,0x00,0x00,
+0x00,0x00,0x00,0xFF,0x44,0x44,0x44,0x44,0x44,0x44,0x44,0xFF,0x00,0x00,0x00,0x00,
+
+
+};
+
+u8 code ledduan2[32]=
+{
+ /*--  文字:  强  --*/
+/*--  宋体12;  此字体下对应的点阵为：宽x高=16x16   --*/
+0x02,0xE2,0x22,0x22,0x3E,0x00,0x80,0x9E,0x92,0x92,0xF2,0x92,0x92,0x9E,0x80,0x00,
+0x00,0x43,0x82,0x42,0x3E,0x40,0x47,0x44,0x44,0x44,0x7F,0x44,0x44,0x54,0xE7,0x00,
+};
+
+u8 code ledduan3[32]=
+{
+/*--  文字:  不  --*/
+/*--  宋体12;  此字体下对应的点阵为：宽x高=16x16   --*/
+0x00,0x02,0x02,0x02,0x02,0x82,0x42,0xF2,0x0E,0x42,0x82,0x02,0x02,0x02,0x00,0x00,
+0x10,0x08,0x04,0x02,0x01,0x00,0x00,0xFF,0x00,0x00,0x00,0x01,0x02,0x0C,0x00,0x00,
+};
+
+u8 code ledduan4[32]=
+{//息 
+0x00,0x00,0x00,0xFC,0x54,0x54,0x56,0x55,0x54,0x54,0x54,0xFC,0x00,0x00,0x00,0x00,
+0x40,0x30,0x00,0x03,0x39,0x41,0x41,0x45,0x59,0x41,0x41,0x73,0x00,0x08,0x30,0x00,
+} ;
+
+u8 code ledduan5[32]=
+{
+/*--  文字:  厚  --*/
+/*--  宋体12;  此字体下对应的点阵为：宽x高=16x16   --*/
+0x00,0x00,0xFE,0x02,0x02,0xFA,0xAA,0xAA,0xAA,0xAA,0xAA,0xAA,0xFA,0x02,0x02,0x00,
+0x80,0x60,0x1F,0x00,0x10,0x12,0x12,0x52,0x92,0x72,0x1A,0x16,0x12,0x10,0x10,0x00,
+}  ;
+
+
+u8 code ledduan6[32]=
+{
+/*--  文字:  德  --*/
+/*--  宋体12;  此字体下对应的点阵为：宽x高=16x16   --*/
+0x10,0x88,0xC4,0x33,0x04,0xF4,0x94,0x94,0xF4,0x9F,0xF4,0x94,0x94,0xF4,0x04,0x00,
+0x01,0x00,0xFF,0x00,0x42,0x32,0x02,0x72,0x82,0x86,0x9A,0x82,0xE2,0x0A,0x32,0x00,
+}	;
+
+u8 code ledduan7[32]=
+{
+/*--  文字:  载  --*/
+/*--  宋体12;  此字体下对应的点阵为：宽x高=16x16   --*/
+0x90,0x94,0x94,0xF4,0x9F,0x94,0x94,0x94,0x10,0x10,0xFF,0x10,0x12,0xD4,0x10,0x00,
+0x20,0x26,0x25,0x24,0xFE,0x14,0x14,0x14,0x80,0x40,0x27,0x18,0x26,0x41,0xF0,0x00,
+}	 ;
+
+
+u8 code ledduan8[32]=
+{
+/*--  文字:  物  --*/
+/*--  宋体12;  此字体下对应的点阵为：宽x高=16x16   --*/
+0x40,0x3C,0x10,0xFF,0x10,0x10,0x20,0x10,0x8F,0x78,0x08,0xF8,0x08,0xF8,0x00,0x00,
+0x02,0x06,0x02,0xFF,0x01,0x01,0x04,0x42,0x21,0x18,0x46,0x81,0x40,0x3F,0x00,0x00,
+
+}	  ;
+
+
+ 
+
+void delay(u16 i)
+{
+   while(i--);
+}
+
+
+int anjian()
+{	 int a;
+	if(k1==0)		 
+	{	
+		delay(1000);   //消除抖动 一般大约10ms
+		if(k1==0)	 //再次判断按键是否按下
+		{
+			a=1;
+			
+		}
+		while(!k1);	 //检测按键是否松开
+	}		
+		if(k2==0)		 
+	{	
+		delay(1000);   //消除抖动 一般大约10ms
+		if(k2==0)	 //再次判断按键是否按下
+		{
+			a=2;
+			
+		}
+		while(!k2);	 //检测按键是否松开
+	}		
+		if(k3==0)		 
+	{	
+		delay(1000);   //消除抖动 一般大约10ms
+		if(k3==0)	 //再次判断按键是否按下
+		{
+			a=3;
+			
+		}
+		while(!k3);	 //检测按键是否松开
+	}		
+		if(k4==0)		 
+	{	
+		delay(1000);   //消除抖动 一般大约10ms
+		if(k4==0)	 //再次判断按键是否按下
+		{
+			a=4;
+			
+		}
+		while(!k4);	 //检测按键是否松开
+	}		
+		if(k5==0)		 
+	{	
+		delay(1000);   //消除抖动 一般大约10ms
+		if(k5==0)	 //再次判断按键是否按下
+		{
+			a=5;
+			
+		}
+		while(!k5);	 //检测按键是否松开
+	}		
+		if(k6==0)		 
+	{	
+		delay(1000);   //消除抖动 一般大约10ms
+		if(k6==0)	 //再次判断按键是否按下
+		{
+			a=6;
+			
+		}
+		while(!k6);	 //检测按键是否松开
+	}		
+		if(k7==0)		 
+	{	
+		delay(1000);   //消除抖动 一般大约10ms
+		if(k7==0)	 //再次判断按键是否按下
+		{
+			a=7;
+			
+		}
+		while(!k7);	 //检测按键是否松开
+	}		
+		if(k8==0)		 
+	{	
+		delay(1000);   //消除抖动 一般大约10ms
+		if(k8==0)	 //再次判断按键是否按下
+		{
+			a=8;
+			
+		}
+		while(!k8);	 //检测按键是否松开
+	}	
+	return a;	
+}
+
+
+
+
+
+void Hc595SendByte(u8 dat1,u8 dat2,u8 dat3,u8 dat4)
+{
+	u8 a;
+
+	SRCLK = 1;
+	RCLK1 = 1;
+
+	for(a=0;a<8;a++)		 //发送8位数
+	{
+		SER = dat1 >> 7;		 //从最高位开始发送
+		dat1 <<= 1;
+
+		SRCLK = 0;			 //发送时序
+		_nop_();
+		_nop_();
+		SRCLK = 1;	
+	}
+
+	for(a=0;a<8;a++)		 //发送8位数
+	{
+		SER = dat2 >> 7;		 //从最高位开始发送
+		dat2 <<= 1;
+
+		SRCLK = 0;			 //发送时序
+		_nop_();
+		_nop_();
+		SRCLK = 1;	
+	}
+
+	for(a=0;a<8;a++)		 //发送8位数
+	{
+		SER = dat3 >> 7;		 //从最高位开始发送
+		dat3 <<= 1;
+
+		SRCLK = 0;			 //发送时序
+		_nop_();
+		_nop_();
+		SRCLK = 1;	
+	}
+
+	for(a=0;a<8;a++)		 //发送8位数
+	{
+		SER = dat4 >> 7;		 //从最高位开始发送
+		dat4 <<= 1;
+
+		SRCLK = 0;			 //发送时序
+		_nop_();
+		_nop_();
+		SRCLK = 1;	
+	}
+
+	RCLK1 = 0;
+	_nop_();
+	_nop_();
+	RCLK1 = 1;
+}
+
+
+
+void main()
+{	
+	u8 i;
+	int a;
+
+		   	led=0x01;
+			 delay(50000);
+			 	  for(i=0;i<7;i++)
+			  {
+			    P0=~(0x01<<i);
+				delay(500000);
+					led=0;
+			}	 
+			led=~0x01;
+	while(1)
+	{	  
+			
+		 a=anjian();
+	   switch(a)
+	   {
+	   
+		case(1):   for(i=0;i<16;i++)
+		{
+			Hc595SendByte(~ledwei[i+16],~ledwei[i],ledduan1[16+i],ledduan1[i]);
+			delay(10);
+             
+		} break;
+		case(2):   for(i=0;i<16;i++)
+		{
+			Hc595SendByte(~ledwei[i+16],~ledwei[i],ledduan2[16+i],ledduan2[i]);
+			delay(10);
+             
+		} break;
+		case(3):   for(i=0;i<16;i++)
+		{
+			Hc595SendByte(~ledwei[i+16],~ledwei[i],ledduan3[16+i],ledduan3[i]);
+			delay(10);
+             
+		} break;
+		case(4):   for(i=0;i<16;i++)
+		{
+			Hc595SendByte(~ledwei[i+16],~ledwei[i],ledduan4[16+i],ledduan4[i]);
+			delay(10);
+             
+		} break;
+		case(5):   for(i=0;i<16;i++)
+		{
+			Hc595SendByte(~ledwei[i+16],~ledwei[i],ledduan5[16+i],ledduan5[i]);
+			delay(10);
+             
+		} break;
+		case(6):   for(i=0;i<16;i++)
+		{
+			Hc595SendByte(~ledwei[i+16],~ledwei[i],ledduan6[16+i],ledduan6[i]);
+			delay(10);
+             
+		} break;
+	
+		case(7):   for(i=0;i<16;i++)
+		{
+			Hc595SendByte(~ledwei[i+16],~ledwei[i],ledduan7[16+i],ledduan7[i]);
+			delay(10);
+             
+		} break;
+			case(8):   for(i=0;i<16;i++)
+		{
+			Hc595SendByte(~ledwei[i+16],~ledwei[i],ledduan8[16+i],ledduan8[i]);
+			delay(10);
+             
+		} break;
+		}
+
+       }
+	}	
